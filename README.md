@@ -320,7 +320,37 @@ Current parser behavior:
 - `/pdf/confirm` saves user-confirmed candidates as project expenses and links them to a `pdf_imports` record.
 - Exact duplicate PDF file imports are rejected by file hash.
 
-Next planned slices:
 
-- End-to-end frontend/back-end workflow testing with real sample data
-- Alembic migrations before serious GCP deployment
+## Development Process using Codex
+
+This project was built step by step, with each major part tested before moving on to the next stage. The goal was to avoid building too much at once without confirming that the previous layer worked correctly.
+
+The general workflow was:
+
+1. Created the GitHub repository and organized the project structure.
+2. Set up the backend using FastAPI.
+3. Designed the database models for projects, expenses, income, and PDF imports.
+4. Built the PDF parser, which was the most important part of the project. The parser extracts transaction data from text-based credit card statement PDFs and prepares it for review before saving.
+5. Created backend API endpoints for projects, expenses, income, dashboard summaries, and PDF import flows.
+6. Tested the backend fully with focused test cases for each feature.
+7. Built the frontend in Lovable and connected it to the backend API.
+
+Codex was used as an AI coding assistant during development. It helped with planning backend structure, writing API endpoints, improving frontend-backend integration, creating test cases, fixing UI issues, and updating documentation. It did not replace manual decision-making: the project direction, feature requirements, testing flow, and final behavior were reviewed step by step by the developer.
+
+Markdown planning files were also used during development. These `.md` files described the project requirements, backend behavior, frontend expectations, and API contract. This helped keep the backend and frontend aligned so the Lovable-generated frontend could connect to the FastAPI backend more smoothly.
+
+Testing was done throughout the process instead of only at the end. After each major feature was added, simple tests were created to confirm that the code worked before continuing. AI tools were also used to help suggest basic test cases and identify edge cases, but the tests were run locally to verify the actual behavior.
+
+## Future Work
+
+Possible future improvements include:
+
+- Deploy the frontend using Firebase Hosting.
+- Deploy the backend using Google Cloud Run.
+- Move from local SQLite to Cloud SQL PostgreSQL for production.
+- Add Alembic migrations so database schema changes can be managed more safely.
+- Add authentication and user accounts.
+- Improve PDF parser coverage for more bank statement formats.
+- Add CI/CD so tests run automatically before deployment.
+
+The current code is structured to make migration easier because the backend already uses SQLAlchemy and reads the database connection from `DATABASE_URL`. This means the local SQLite database can later be replaced with PostgreSQL without needing to rewrite the main API logic.
