@@ -21,11 +21,11 @@ import { mockApi } from "./mockApi";
  * All persistent reads/writes go through here. Components must not call fetch directly.
  *
  * The real FastAPI backend is used by default. Set VITE_API_BASE_URL if the
- * backend is running somewhere other than http://127.0.0.1:8001.
+ * backend is running somewhere other than http://127.0.0.1:8010.
  * Set VITE_USE_MOCK_API=true only when you intentionally want demo data.
  */
 
-const DEFAULT_BASE_URL = "http://127.0.0.1:8001";
+const DEFAULT_BASE_URL = "http://127.0.0.1:8010";
 const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
 const BASE_URL = (configuredBaseUrl || DEFAULT_BASE_URL).replace(/\/$/, "");
 export const USE_MOCK =

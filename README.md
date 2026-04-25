@@ -45,14 +45,14 @@ py -3.10 -m venv ..\.venv
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m app.create_tables
-uvicorn app.main:app --reload --port 8001
+uvicorn app.main:app --reload --port 8010
 ```
 
 Then open:
 
-- `http://127.0.0.1:8001/health`
-- `http://127.0.0.1:8001/health/db`
-- `http://127.0.0.1:8001/docs`
+- `http://127.0.0.1:8010/health`
+- `http://127.0.0.1:8010/health/db`
+- `http://127.0.0.1:8010/docs`
 
 ## Frontend Setup
 
@@ -68,13 +68,13 @@ npm run dev
 The default frontend API base URL is:
 
 ```text
-http://127.0.0.1:8001
+http://127.0.0.1:8010
 ```
 
 Use `frontend/.env` to override local settings:
 
 ```text
-VITE_API_BASE_URL=http://127.0.0.1:8001
+VITE_API_BASE_URL=http://127.0.0.1:8010
 VITE_USE_MOCK_API=false
 ```
 
@@ -91,7 +91,7 @@ Terminal 1:
 ```powershell
 cd backend
 ..\.venv\Scripts\Activate.ps1
-uvicorn app.main:app --reload --port 8001
+uvicorn app.main:app --reload --port 8010
 ```
 
 Terminal 2:
@@ -114,7 +114,7 @@ source ../.venv/bin/activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m app.create_tables
-uvicorn app.main:app --reload --port 8001
+uvicorn app.main:app --reload --port 8010
 ```
 
 ## Development Checks
@@ -179,7 +179,7 @@ Projects, expenses, and income all store `created_at` and `updated_at` timestamp
 
 Open the interactive API docs at:
 
-- `http://127.0.0.1:8001/docs`
+- `http://127.0.0.1:8010/docs`
 
 Health:
 
@@ -229,7 +229,7 @@ The backend allows local frontend requests from:
 - `http://localhost:8080`
 - `http://127.0.0.1:8080`
 
-The frontend should use `VITE_API_BASE_URL` for the backend base URL. For local development, use `http://127.0.0.1:8001`. The API service uses the real backend by default and only uses the in-memory mock API when `VITE_USE_MOCK_API=true`.
+The frontend should use `VITE_API_BASE_URL` for the backend base URL. For local development, use `http://127.0.0.1:8010`. The API service uses the real backend by default and only uses the in-memory mock API when `VITE_USE_MOCK_API=true`.
 
 ## PDF Parser
 
