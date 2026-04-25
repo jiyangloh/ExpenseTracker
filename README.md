@@ -34,104 +34,155 @@ frontend/
 The local SQLite database is generated at `backend/project.db` and is ignored by git.
 The Lovable frontend export was copied into `frontend/` for repository organization. Frontend dependencies and build output are generated locally and ignored by git.
 
-## Backend Setup On Windows
+## Local Setup From Fresh Clone
 
-From a fresh clone:
+Prerequisites:
+
+- Git
+- Python 3.10 or newer
+- Node.js 18 or newer with npm
+
+The app runs as two local processes:
+
+- Backend FastAPI API: `http://127.0.0.1:8001`
+- Frontend Vite app: `http://localhost:5173`
+
+### Windows
+
+Clone the repository and enter the project:
 
 ```powershell
+git clone <repo-url>
+cd ExpenseTracker
+```
+
+Set up and start the backend in Terminal 1:
+
+```powershell
+py -3.10 -m venv .venv
+.\.venv\Scripts\Activate.ps1
 cd backend
-py -3.10 -m venv ..\.venv
-..\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m app.create_tables
 uvicorn app.main:app --reload --port 8001
 ```
 
-Then open:
-
-- `http://127.0.0.1:8001/health`
-- `http://127.0.0.1:8001/health/db`
-- `http://127.0.0.1:8001/docs`
-
-## Frontend Setup
-
-From the repo root:
+Set up and start the frontend in Terminal 2:
 
 ```powershell
-cd frontend
+cd ExpenseTracker\frontend
 npm install
 Copy-Item .env.example .env
 npm run dev
 ```
 
-The default frontend API base URL is:
+Open:
 
-```text
-http://127.0.0.1:8001
+- Frontend: `http://localhost:5173`
+- Backend health: `http://127.0.0.1:8001/health`
+- API docs: `http://127.0.0.1:8001/docs`
+
+### macOS/Linux
+
+Clone the repository and enter the project:
+
+```bash
+git clone <repo-url>
+cd ExpenseTracker
 ```
 
-Use `frontend/.env` to override local settings:
+Set up and start the backend in Terminal 1:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+cd backend
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+python -m app.create_tables
+uvicorn app.main:app --reload --port 8001
+```
+
+Set up and start the frontend in Terminal 2:
+
+```bash
+cd ExpenseTracker/frontend
+npm install
+cp .env.example .env
+npm run dev
+```
+
+Open:
+
+- Frontend: `http://localhost:5173`
+- Backend health: `http://127.0.0.1:8001/health`
+- API docs: `http://127.0.0.1:8001/docs`
+
+### Daily Local Run
+
+After the first setup, start the backend:
+
+```powershell
+cd backend
+..\.venv\Scripts\Activate.ps1
+uvicorn app.main:app --reload --port 8001
+```
+
+On macOS/Linux, activate with:
+
+```bash
+source ../.venv/bin/activate
+```
+
+Start the frontend in a second terminal:
+
+```bash
+cd frontend
+npm run dev
+```
+
+The frontend uses `frontend/.env`:
 
 ```text
 VITE_API_BASE_URL=http://127.0.0.1:8001
 VITE_USE_MOCK_API=false
 ```
 
+If the backend runs on a different port, update `VITE_API_BASE_URL` in `frontend/.env`.
 Set `VITE_USE_MOCK_API=true` only for demo mode. Persistent project, expense, income, dashboard, and PDF import data should come from the FastAPI backend.
-
-The Vite development server normally opens at:
-
-- `http://localhost:5173`
-
-## Full Stack Local Run
-
-Terminal 1:
-
-```powershell
-cd backend
-..\.venv\Scripts\Activate.ps1
-uvicorn app.main:app --reload --port 8001
-```
-
-Terminal 2:
-
-```powershell
-cd frontend
-npm run dev
-```
-
-If the backend runs on a different port, update `frontend/.env` with the matching `VITE_API_BASE_URL`.
-
-## Backend Setup On macOS/Linux
-
-From a fresh clone:
-
-```bash
-cd backend
-python3 -m venv ../.venv
-source ../.venv/bin/activate
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-python -m app.create_tables
-uvicorn app.main:app --reload --port 8001
-```
 
 ## Development Checks
 
-Install the optional development dependencies:
+Backend checks:
 
 ```bash
+cd backend
+source ../.venv/bin/activate  # macOS/Linux
 pip install -r requirements-dev.txt
 pytest
+```
+
+On Windows, activate the virtual environment with:
+
+```powershell
+..\.venv\Scripts\Activate.ps1
+```
+
+Frontend checks:
+
+```bash
+cd frontend
+npm run test
+npm run build
 ```
 
 Latest verification:
 
 ```text
-Backend: 16 passed
+Backend: 17 passed
 Frontend build: passed
-Frontend tests: 1 passed
+Frontend tests: 4 passed
 ```
 
 Frontend lint currently reports Lovable/shadcn template issues in `src/components/ui/command.tsx`, `src/components/ui/textarea.tsx`, and `tailwind.config.ts`, plus fast-refresh warnings for shared UI exports. These were documented instead of hidden because they came from the exported UI template.
