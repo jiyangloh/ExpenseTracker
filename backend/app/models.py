@@ -1,10 +1,14 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Optional
 
 from sqlalchemy import Boolean, Date, DateTime, Float, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+
+def utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 class Project(Base):
@@ -18,12 +22,13 @@ class Project(Base):
     total_budget: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     status: Mapped[str] = mapped_column(String(50), nullable=False, default="active")
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+        DateTime(timezone=True), default=utc_now, server_default=func.now(), nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
+        default=utc_now,
         server_default=func.now(),
-        onupdate=func.now(),
+        onupdate=utc_now,
         nullable=False,
     )
 
@@ -48,7 +53,7 @@ class PDFImport(Base):
     filename: Mapped[str] = mapped_column(String(255), nullable=False)
     file_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
     uploaded_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+        DateTime(timezone=True), default=utc_now, server_default=func.now(), nullable=False
     )
     statement_period_start: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     statement_period_end: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
@@ -68,8 +73,9 @@ class PDFImport(Base):
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
+        default=utc_now,
         server_default=func.now(),
-        onupdate=func.now(),
+        onupdate=utc_now,
         nullable=False,
     )
 
@@ -99,12 +105,13 @@ class Expense(Base):
     source: Mapped[str] = mapped_column(String(50), nullable=False, default="manual")
     source_file: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+        DateTime(timezone=True), default=utc_now, server_default=func.now(), nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
+        default=utc_now,
         server_default=func.now(),
-        onupdate=func.now(),
+        onupdate=utc_now,
         nullable=False,
     )
 
@@ -125,12 +132,13 @@ class Income(Base):
     source: Mapped[str] = mapped_column(String(255), nullable=False)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+        DateTime(timezone=True), default=utc_now, server_default=func.now(), nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
+        default=utc_now,
         server_default=func.now(),
-        onupdate=func.now(),
+        onupdate=utc_now,
         nullable=False,
     )
 

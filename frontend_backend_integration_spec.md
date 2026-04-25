@@ -58,9 +58,11 @@ The frontend should use an environment variable for the backend base URL.
 
 The variable name must be `VITE_API_BASE_URL`.
 
-Local development may use `http://127.0.0.1:8000`.
+Local development may use `http://127.0.0.1:8001`.
 
 Production deployment may use a GCP Cloud Run backend URL.
+
+The frontend may include demo mock data only behind an explicit environment flag named `VITE_USE_MOCK_API`. Real backend API calls should remain the default behavior.
 
 ## 7. API Contract Overview
 
@@ -383,9 +385,9 @@ The frontend should pass filter values to the backend when possible.
 
 The backend must allow requests from the frontend development server.
 
-The local frontend may run on `http://localhost:5173`.
+The local frontend may run on `http://localhost:5173` or `http://localhost:8080`.
 
-The local backend may run on `http://127.0.0.1:8000`.
+The local backend may run on `http://127.0.0.1:8001`.
 
 The backend must also allow the deployed frontend URL if the project is deployed.
 
@@ -406,6 +408,8 @@ Lovable may generate mock data during initial UI generation.
 After export, mock data should be replaced with real API calls.
 
 Mock data can remain only as fallback demo data if clearly documented, but it must not be the main source of truth.
+
+If mock data remains after Lovable export, it should only run when `VITE_USE_MOCK_API` is explicitly enabled. Leaving `VITE_USE_MOCK_API` unset or false should make the frontend call the backend REST API.
 
 ## 20. Page Requirements
 

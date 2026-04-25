@@ -8,9 +8,14 @@ backend/project.db
 # Local environment overrides.
 .env
 .env.*
+!.env.example
+!frontend/.env.example
+
+# Frontend generated dependencies/build output.
+frontend/node_modules/
+frontend/dist/
 
 # Test and tooling caches.
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-

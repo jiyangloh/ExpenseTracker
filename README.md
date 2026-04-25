@@ -2,7 +2,7 @@
 
 A small project cost management system for tracking projects, expenses, income, and claim status.
 
-The current backend contains the FastAPI foundation, SQLite/SQLAlchemy models, database table creation, health checks, and a structured PDF parser for credit card statement expense candidates.
+The current project contains a FastAPI backend and a Lovable-exported Vite React frontend connected through the documented REST API contract.
 
 ## Project Structure
 
@@ -21,9 +21,18 @@ backend/
     fixtures/
   requirements.txt
   requirements-dev.txt
+frontend/
+  src/
+    lib/
+      api.ts
+      mockApi.ts
+      types.ts
+  .env.example
+  package.json
 ```
 
 The local SQLite database is generated at `backend/project.db` and is ignored by git.
+The Lovable frontend export was copied into `frontend/` for repository organization. Frontend dependencies and build output are generated locally and ignored by git.
 
 ## Backend Setup On Windows
 
@@ -36,14 +45,63 @@ py -3.10 -m venv ..\.venv
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m app.create_tables
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --port 8001
 ```
 
 Then open:
 
-- `http://127.0.0.1:8000/health`
-- `http://127.0.0.1:8000/health/db`
-- `http://127.0.0.1:8000/docs`
+- `http://127.0.0.1:8001/health`
+- `http://127.0.0.1:8001/health/db`
+- `http://127.0.0.1:8001/docs`
+
+## Frontend Setup
+
+From the repo root:
+
+```powershell
+cd frontend
+npm install
+Copy-Item .env.example .env
+npm run dev
+```
+
+The default frontend API base URL is:
+
+```text
+http://127.0.0.1:8001
+```
+
+Use `frontend/.env` to override local settings:
+
+```text
+VITE_API_BASE_URL=http://127.0.0.1:8001
+VITE_USE_MOCK_API=false
+```
+
+Set `VITE_USE_MOCK_API=true` only for demo mode. Persistent project, expense, income, dashboard, and PDF import data should come from the FastAPI backend.
+
+The Vite development server normally opens at:
+
+- `http://localhost:5173`
+
+## Full Stack Local Run
+
+Terminal 1:
+
+```powershell
+cd backend
+..\.venv\Scripts\Activate.ps1
+uvicorn app.main:app --reload --port 8001
+```
+
+Terminal 2:
+
+```powershell
+cd frontend
+npm run dev
+```
+
+If the backend runs on a different port, update `frontend/.env` with the matching `VITE_API_BASE_URL`.
 
 ## Backend Setup On macOS/Linux
 
@@ -56,7 +114,7 @@ source ../.venv/bin/activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 python -m app.create_tables
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --port 8001
 ```
 
 ## Development Checks
@@ -71,8 +129,12 @@ pytest
 Latest verification:
 
 ```text
-16 passed
+Backend: 16 passed
+Frontend build: passed
+Frontend tests: 1 passed
 ```
+
+Frontend lint currently reports Lovable/shadcn template issues in `src/components/ui/command.tsx`, `src/components/ui/textarea.tsx`, and `tailwind.config.ts`, plus fast-refresh warnings for shared UI exports. These were documented instead of hidden because they came from the exported UI template.
 
 ## Database Configuration
 
@@ -105,6 +167,9 @@ Implemented:
 - PDF parse and confirm-save APIs
 - PDF parser for structured credit card statement PDFs using `pdfplumber`
 - CORS support for the local frontend development server
+- Lovable-exported Vite React frontend copied into `frontend/`
+- Centralized frontend API service in `frontend/src/lib/api.ts`
+- Frontend API normalization for backend IDs, dashboard arrays, PDF parse, and PDF confirm responses
 
 PDF imports are tracked in the `pdf_imports` table. Each PDF import belongs to a project, stores the uploaded filename/hash, optional statement dates, extracted/confirmed/ignored transaction counts, import status, and timestamps. Expenses imported from a PDF can link back to the upload through `expenses.pdf_import_id`, while manually entered expenses leave that field empty.
 
@@ -114,7 +179,7 @@ Projects, expenses, and income all store `created_at` and `updated_at` timestamp
 
 Open the interactive API docs at:
 
-- `http://127.0.0.1:8000/docs`
+- `http://127.0.0.1:8001/docs`
 
 Health:
 
@@ -161,8 +226,10 @@ The backend allows local frontend requests from:
 
 - `http://localhost:5173`
 - `http://127.0.0.1:5173`
+- `http://localhost:8080`
+- `http://127.0.0.1:8080`
 
-The frontend should use `VITE_API_BASE_URL` for the backend base URL. For local development, use `http://127.0.0.1:8000`.
+The frontend should use `VITE_API_BASE_URL` for the backend base URL. For local development, use `http://127.0.0.1:8001`. The API service uses the real backend by default and only uses the in-memory mock API when `VITE_USE_MOCK_API=true`.
 
 ## PDF Parser
 
@@ -204,5 +271,5 @@ Current parser behavior:
 
 Next planned slices:
 
-- Lovable-exported frontend integration
+- End-to-end frontend/back-end workflow testing with real sample data
 - Alembic migrations before serious GCP deployment
