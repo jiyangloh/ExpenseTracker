@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2, Filter, X } from "lucide-react";
 import { toast } from "sonner";
 
 import PageHeader from "@/components/PageHeader";
+import MoneyInput from "@/components/MoneyInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -476,6 +477,7 @@ const ExpenseFormDialog = ({ title, initial, projects, submitting, onSubmit }: E
           onSubmit({
             ...form,
             amount: Number(form.amount),
+            currency: "MYR",
             claimed_date: form.is_claimed ? form.claimed_date || todayStr() : null,
           });
         }}
@@ -542,19 +544,19 @@ const ExpenseFormDialog = ({ title, initial, projects, submitting, onSubmit }: E
           <div className="space-y-1.5">
             <Label>Currency</Label>
             <Input
-              value={form.currency ?? "MYR"}
-              onChange={(e) => setForm({ ...form, currency: e.target.value.toUpperCase() })}
+              value="MYR"
+              readOnly
+              aria-readonly="true"
+              className="bg-muted text-muted-foreground"
             />
           </div>
         </div>
         <div className="space-y-1.5">
           <Label>Amount</Label>
-          <Input
-            type="number"
-            min={0}
-            step="0.01"
+          <MoneyInput
+            placeholder="0.00"
             value={form.amount}
-            onChange={(e) => setForm({ ...form, amount: Number(e.target.value) })}
+            onValueChange={(value) => setForm({ ...form, amount: value })}
             required
           />
         </div>

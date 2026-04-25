@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import PageHeader from "@/components/PageHeader";
+import MoneyInput from "@/components/MoneyInput";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -296,7 +297,7 @@ const IncomeFormDialog = ({ title, initial, projects, submitting, onSubmit }: In
           if (!form.project_id) return toast.error("Project is required");
           if (!form.source?.trim()) return toast.error("Source is required");
           if (!form.amount || form.amount <= 0) return toast.error("Amount must be > 0");
-          onSubmit({ ...form, amount: Number(form.amount) });
+          onSubmit({ ...form, amount: Number(form.amount), currency: "MYR" });
         }}
         className="space-y-4"
       >
@@ -336,20 +337,20 @@ const IncomeFormDialog = ({ title, initial, projects, submitting, onSubmit }: In
         <div className="grid grid-cols-3 gap-3">
           <div className="col-span-2 space-y-1.5">
             <Label>Amount</Label>
-            <Input
-              type="number"
-              min={0}
-              step="0.01"
+            <MoneyInput
+              placeholder="0.00"
               value={form.amount}
-              onChange={(e) => setForm({ ...form, amount: Number(e.target.value) })}
+              onValueChange={(value) => setForm({ ...form, amount: value })}
               required
             />
           </div>
           <div className="space-y-1.5">
             <Label>Currency</Label>
             <Input
-              value={form.currency ?? "MYR"}
-              onChange={(e) => setForm({ ...form, currency: e.target.value.toUpperCase() })}
+              value="MYR"
+              readOnly
+              aria-readonly="true"
+              className="bg-muted text-muted-foreground"
             />
           </div>
         </div>

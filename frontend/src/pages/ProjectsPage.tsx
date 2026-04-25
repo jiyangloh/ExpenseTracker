@@ -5,6 +5,7 @@ import { Plus, FolderOpen, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import PageHeader from "@/components/PageHeader";
+import MoneyInput from "@/components/MoneyInput";
 import StatusBadge from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +49,12 @@ const emptyProject: ProjectInput = {
   total_budget: 0,
   status: "active",
 };
+
+function nextIsoDate(date: string | null | undefined): string | undefined {
+  if (!date) return undefined;
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day + 1)).toISOString().slice(0, 10);
+}
 
 const ProjectsPage = () => {
   const navigate = useNavigate();
@@ -265,6 +272,10 @@ const ProjectFormDialog = ({ title, initial, submitting, onSubmit }: FormDialogP
             toast.error("Name is required");
             return;
           }
+          if (form.start_date && form.end_date && form.end_date <= form.start_date) {
+            toast.error("End date must be after start date");
+            return;
+          }
           onSubmit({
             ...form,
             start_date: form.start_date || null,
@@ -299,7 +310,17 @@ const ProjectFormDialog = ({ title, initial, submitting, onSubmit }: FormDialogP
               id="start"
               type="date"
               value={form.start_date ?? ""}
-              onChange={(e) => setForm({ ...form, start_date: e.target.value })}
+              onChange={(e) => {
+                const startDate = e.target.value;
+                setForm({
+                  ...form,
+                  start_date: startDate,
+                  end_date:
+                    startDate && form.end_date && form.end_date <= startDate
+                      ? ""
+                      : form.end_date,
+                });
+              }}
             />
           </div>
           <div className="space-y-1.5">
@@ -307,6 +328,7 @@ const ProjectFormDialog = ({ title, initial, submitting, onSubmit }: FormDialogP
             <Input
               id="end"
               type="date"
+              min={nextIsoDate(form.start_date)}
               value={form.end_date ?? ""}
               onChange={(e) => setForm({ ...form, end_date: e.target.value })}
             />
@@ -315,13 +337,11 @@ const ProjectFormDialog = ({ title, initial, submitting, onSubmit }: FormDialogP
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="budget">Total budget (MYR)</Label>
-            <Input
+            <MoneyInput
               id="budget"
-              type="number"
-              min={0}
-              step="0.01"
-              value={form.total_budget ?? 0}
-              onChange={(e) => setForm({ ...form, total_budget: Number(e.target.value) })}
+              placeholder="0.00"
+              value={form.total_budget}
+              onValueChange={(value) => setForm({ ...form, total_budget: value })}
             />
           </div>
           <div className="space-y-1.5">

@@ -58,7 +58,7 @@ The frontend should use an environment variable for the backend base URL.
 
 The variable name must be `VITE_API_BASE_URL`.
 
-Local development may use `http://127.0.0.1:8010`.
+Local development may use `http://127.0.0.1:8001`.
 
 Production deployment may use a GCP Cloud Run backend URL.
 
@@ -387,7 +387,7 @@ The backend must allow requests from the frontend development server.
 
 The local frontend may run on `http://localhost:5173` or `http://localhost:8080`.
 
-The local backend may run on `http://127.0.0.1:8010`.
+The local backend may run on `http://127.0.0.1:8001`.
 
 The backend must also allow the deployed frontend URL if the project is deployed.
 
