@@ -20,11 +20,20 @@ class Project(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
 
     expenses: Mapped[list["Expense"]] = relationship(
         back_populates="project", cascade="all, delete-orphan"
     )
     income: Mapped[list["Income"]] = relationship(
+        back_populates="project", cascade="all, delete-orphan"
+    )
+    pdf_imports: Mapped[list["PDFImport"]] = relationship(
         back_populates="project", cascade="all, delete-orphan"
     )
 
@@ -33,14 +42,38 @@ class PDFImport(Base):
     __tablename__ = "pdf_imports"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id"), nullable=False, index=True
+    )
     filename: Mapped[str] = mapped_column(String(255), nullable=False)
     file_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
-    status: Mapped[str] = mapped_column(String(50), nullable=False, default="uploaded")
+    statement_period_start: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
+    statement_period_end: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
+    statement_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
+    candidate_count: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    confirmed_count: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    ignored_count: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    status: Mapped[str] = mapped_column(
+        String(50), nullable=False, default="uploaded", server_default="uploaded"
+    )
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
 
+    project: Mapped[Project] = relationship(back_populates="pdf_imports")
     expenses: Mapped[list["Expense"]] = relationship(back_populates="pdf_import")
 
 
@@ -68,6 +101,12 @@ class Expense(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
 
     project: Mapped[Project] = relationship(back_populates="expenses")
     pdf_import: Mapped[Optional[PDFImport]] = relationship(back_populates="expenses")
@@ -87,6 +126,12 @@ class Income(Base):
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
     )
 
     project: Mapped[Project] = relationship(back_populates="income")
