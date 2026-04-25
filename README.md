@@ -13,6 +13,8 @@ backend/
     database.py
     main.py
     models.py
+    schemas.py
+    routers/
     services/
       pdf_parser.py
   tests/
@@ -69,7 +71,7 @@ pytest
 Latest verification:
 
 ```text
-10 passed
+16 passed
 ```
 
 ## Database Configuration
@@ -95,11 +97,72 @@ Implemented:
 - SQLAlchemy models for projects, expenses, income, and PDF imports
 - Table creation command
 - API health checks
+- Project CRUD API
+- Expense CRUD API with filters
+- Income CRUD API with project filtering
+- Expense claim toggle and bulk claim update APIs
+- Project dashboard aggregation API
+- PDF parse and confirm-save APIs
 - PDF parser for structured credit card statement PDFs using `pdfplumber`
+- CORS support for the local frontend development server
 
 PDF imports are tracked in the `pdf_imports` table. Each PDF import belongs to a project, stores the uploaded filename/hash, optional statement dates, extracted/confirmed/ignored transaction counts, import status, and timestamps. Expenses imported from a PDF can link back to the upload through `expenses.pdf_import_id`, while manually entered expenses leave that field empty.
 
 Projects, expenses, and income all store `created_at` and `updated_at` timestamps.
+
+## API Endpoints
+
+Open the interactive API docs at:
+
+- `http://127.0.0.1:8000/docs`
+
+Health:
+
+- `GET /health`
+- `GET /health/db`
+
+Projects:
+
+- `GET /projects`
+- `POST /projects`
+- `GET /projects/{project_id}`
+- `PUT /projects/{project_id}`
+- `DELETE /projects/{project_id}`
+- `GET /projects/{project_id}/dashboard`
+
+Expenses:
+
+- `GET /expenses`
+- `POST /expenses`
+- `GET /expenses/{expense_id}`
+- `PUT /expenses/{expense_id}`
+- `DELETE /expenses/{expense_id}`
+- `PATCH /expenses/{expense_id}/toggle-claim`
+- `PATCH /expenses/bulk-claim`
+
+Income:
+
+- `GET /income`
+- `POST /income`
+- `GET /income/{income_id}`
+- `PUT /income/{income_id}`
+- `DELETE /income/{income_id}`
+
+PDF import:
+
+- `POST /pdf/parse`
+- `POST /pdf/confirm`
+
+The frontend-backend contract is documented in [frontend_backend_integration_spec.md](frontend_backend_integration_spec.md).
+
+## Frontend Integration Notes
+
+The backend allows local frontend requests from:
+
+- `http://localhost:5173`
+- `http://127.0.0.1:5173`
+
+The frontend should use `VITE_API_BASE_URL` for the backend base URL. For local development, use `http://127.0.0.1:8000`.
 
 ## PDF Parser
 
@@ -135,12 +198,11 @@ Current parser behavior:
 - Skips subtotal rows.
 - Skips zero-amount rows.
 - Keeps finance charges and late payment charges from the transaction table for user review.
-- Returns candidates only; saving to the database will be implemented in a later upload/confirm slice.
+- `/pdf/parse` returns candidates only and does not save them.
+- `/pdf/confirm` saves user-confirmed candidates as project expenses and links them to a `pdf_imports` record.
+- Exact duplicate PDF file imports are rejected by file hash.
 
 Next planned slices:
 
-- CRUD endpoints for projects, expenses, and income
-- Claim toggle endpoints
-- Dashboard aggregation endpoint
-- PDF upload API and preview/confirm save flow
 - Lovable-exported frontend integration
+- Alembic migrations before serious GCP deployment
